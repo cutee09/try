@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Life Hub</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    margin:0;
+    padding:0;
+    transition:0.3s;
+    background: linear-gradient(135deg,#74ebd5,#9face6);
+    color:#222;
+}
+
+.dark{
+    background:#121212;
+    color:#fff;
+}
+
+header{
+    padding:20px;
+    text-align:center;
+    font-size:24px;
+    font-weight:bold;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:20px;
+}
+
+.card{
+    background:white;
+    padding:15px;
+    margin:10px 0;
+    border-radius:12px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+.dark .card{
+    background:#1e1e1e;
+}
+
+input, button{
+    padding:10px;
+    margin:5px;
+    border-radius:8px;
+    border:1px solid #ccc;
+}
+
+button{
+    cursor:pointer;
+    background:#4CAF50;
+    color:white;
+    border:none;
+}
+
+button:hover{
+    opacity:0.8;
+}
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+.small{
+    font-size:12px;
+    opacity:0.7;
+}
+</style>
+</head>
+
+<body>
+
+<header>📚 Student Life Hub</header>
+
+<div class="container">
+
+<div class="topbar">
+    <button onclick="toggleDark()">🌙 Dark Mode</button>
+    <div class="small">Manage your student life easily</div>
+</div>
+
+<!-- Homework -->
+<div class="card">
+<h3>📝 Homework Tracker</h3>
+<input id="homeworkInput" placeholder="Tugasan baru...">
+<button onclick="addHomework()">Tambah</button>
+<ul id="homeworkList"></ul>
+</div>
+
+<!-- Exam Countdown -->
+<div class="card">
+<h3>⏰ Exam Countdown</h3>
+<input type="date" id="examDate">
+<button onclick="saveExam()">Simpan Tarikh</button>
+<p id="countdown"></p>
+</div>
+
+<!-- Daily Goal -->
+<div class="card">
+<h3>🎯 Daily Goal</h3>
+<input id="goalInput" placeholder="Target hari ini...">
+<button onclick="addGoal()">Tambah</button>
+<ul id="goalList"></ul>
+</div>
+
+</div>
+
+<script>
+// DARK MODE
+function toggleDark(){
+    document.body.classList.toggle("dark");
+}
+
+// HOMEWORK
+let homework = JSON.parse(localStorage.getItem("homework")) || [];
+
+function renderHomework(){
+    let list = document.getElementById("homeworkList");
+    list.innerHTML = "";
+    homework.forEach((h,i)=>{
+        list.innerHTML += `<li>${h} <button onclick="delHomework(${i})">✔</button></li>`;
+    });
+    localStorage.setItem("homework", JSON.stringify(homework));
+}
+
+function addHomework(){
+    let val = document.getElementById("homeworkInput").value;
+    if(val){
+        homework.push(val);
+        document.getElementById("homeworkInput").value = "";
+        renderHomework();
+    }
+}
+
+function delHomework(i){
+    homework.splice(i,1);
+    renderHomework();
+}
+
+// GOAL
+let goals = JSON.parse(localStorage.getItem("goals")) || [];
+
+function renderGoals(){
+    let list = document.getElementById("goalList");
+    list.innerHTML = "";
+    goals.forEach((g,i)=>{
+        list.innerHTML += `<li>${g} <button onclick="delGoal(${i})">✔</button></li>`;
+    });
+    localStorage.setItem("goals", JSON.stringify(goals));
+}
+
+function addGoal(){
+    let val = document.getElementById("goalInput").value;
+    if(val){
+        goals.push(val);
+        document.getElementById("goalInput").value = "";
+        renderGoals();
+    }
+}
+
+function delGoal(i){
+    goals.splice(i,1);
+    renderGoals();
+}
+
+// EXAM COUNTDOWN
+function saveExam(){
+    let date = document.getElementById("examDate").value;
+    localStorage.setItem("examDate", date);
+    updateCountdown();
+}
+
+function updateCountdown(){
+    let exam = localStorage.getItem("examDate");
+    if(!exam) return;
+
+    let diff = new Date(exam) - new Date();
+    let days = Math.ceil(diff / (1000*60*60*24));
+
+    document.getElementById("countdown").innerText =
+        days + " hari lagi sebelum exam 📚";
+}
+
+setInterval(updateCountdown, 1000);
+
+// LOAD DATA
+renderHomework();
+renderGoals();
+updateCountdown();
+</script>
+
+</body>
+</html>
